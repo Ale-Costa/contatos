@@ -8,11 +8,15 @@ const getContatos = asyncHandler(async(req, res) => {
 });
 
 const getContatoPorId = asyncHandler(async(req, res) => {
-  res.status(200).json({message: 'Get contato por id'});
+  const contato = await Contato.findById(req.params.id);
+  if(!contato){
+    res.status(404);
+    throw Error('Contato não encontrado');
+  }
+  res.status(200).json(contato);
 });
 
 const cadastrarContato = asyncHandler(async(req, res) => {
-  console.log('O corpo da requisição é: ', req.body);
   const {nome,email,telefone} = req.body;
 
   if (!nome || !email || !telefone) {
@@ -30,11 +34,26 @@ const cadastrarContato = asyncHandler(async(req, res) => {
 });
 
 const atualizarContato = asyncHandler(async(req, res) => {
-  res.status(201).json({message: 'Atualizar contato por id'});
+  const contato = await Contato.findById(req.params.id);
+  if(!contato){
+    res.status(404);
+  }
+  const contatoAtualizado = await Contato.findByIdAndUpdate(req.params.id, req.body, {
+    new: true
+  });
+
+  res.status(201).json(contatoAtualizado);
 });
 
 const deletarContato = asyncHandler(async(req, res) => {
-  res.status(201).json({message: 'Deletar(contato) por id'});
+  const contato = await Contato.findById(req.params.id);
+
+  if(!contato){
+    res.status(404);
+  }
+
+  await Contato.remove();
+  res.status(200).json(contato);
 });
 
 module.exports = {
